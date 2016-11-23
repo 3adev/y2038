@@ -80,17 +80,6 @@ clean-all: clean
 	$(MAKE) -C $(BUSYBOX_DIR) clean
 	$(MAKE) -C $(Y2038TESTS_DIR) clean
 
-# run the image under QEMU
-qemu: $(KERNEL_IMAGE) initramfs
-	@echo "*******************************************"
-	@echo "***                                     ***"
-	@echo "***   NOW RUNNING Y2038 IMAGE IN QEMU   ***"
-	@echo "***                                     ***"
-	@echo "***   To exit, hit Ctrl-A, then X       ***"
-	@echo "***                                     ***"
-	@echo "*******************************************"    
-	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE) -dtb $(KERNEL_DTB) -initrd initramfs -append $(KERNEL_COMMAND_LINE)
-
 #---------------------------------------------------------------------------
 # KERNEL
 #---------------------------------------------------------------------------
@@ -152,9 +141,7 @@ $(GLIBC_SOURCE_DIR)/configure:
 # How to configure the component
 $(GLIBC_BUILD_DIR)/Makefile: $(GLIBC_SOURCE_DIR)/configure  $(KERNEL_HDR)
 	mkdir -p $(GLIBC_BUILD_DIR)
-	echo slibdir=$(ROOTFS_DIR)/lib >> $(GLIBC_BUILD_DIR)/configparms
-	echo sysconfdir=$(ROOTFS_DIR)/etc >> $(GLIBC_BUILD_DIR)/configparms
-	cd $(GLIBC_BUILD_DIR) && $(GLIBC_SOURCE_DIR)/configure --prefix=/usr --host=$(GLIBC_HOST) --with-headers=$(KERNEL_HDR_DIR)/include
+	cd $(GLIBC_BUILD_DIR) && $(GLIBC_SOURCE_DIR)/configure --prefix=/usr --host=$(GLIBC_HOST) --with-headers=$(KERNEL_HDR_DIR)/include libc_cv_forced_unwind=yes libc_cv_c_cleanup=yes
 
 # How to build the component
 $(GLIBC_LIBS): $(GLIBC_BUILD_DIR)/Makefile
@@ -245,3 +232,19 @@ y2038tests-install: y2038tests
 
 initramfs: rootfs
 	(cd $(ROOTFS_DIR) && find | cpio -o --format=newc) > initramfs
+
+#---------------------------------------------------------------------------
+# QEMU
+# Declared last here as it depends on previous targets defined above
+#---------------------------------------------------------------------------
+
+# run the image under QEMU
+qemu: $(KERNEL_IMAGE) $(KERNEL_DTB) initramfs
+	@echo "*******************************************"
+	@echo "***                                     ***"
+	@echo "***   NOW RUNNING Y2038 IMAGE IN QEMU   ***"
+	@echo "***                                     ***"
+	@echo "***   To exit, hit Ctrl-A, then X       ***"
+	@echo "***                                     ***"
+	@echo "*******************************************"
+	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE) -dtb $(KERNEL_DTB) -initrd initramfs -append $(KERNEL_COMMAND_LINE)

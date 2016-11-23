@@ -11,20 +11,21 @@
 
 .PHONY: all install clean
 
-CFLAGS += -g -I $(SYSROOT)/usr/include
-LDFLAGS += -g
+CFLAGS += --sysroot=$(SYSROOT) -isystem =/usr/include -g
 
 all: test_clock_gettime_settime test_clock_gettime_settime64
 
 test_clock_gettime_settime: test_clock_gettime_settime.o
-
-# use static lib for now as dynamic lib does not work
-test_clock_gettime_settime64: test_clock_gettime_settime64.o $(SYSROOT)/usr/lib/libc.a
+	$(CC) $(CFLAGS) -o test_clock_gettime_settime test_clock_gettime_settime.o
 
 test_clock_gettime_settime.o: test_clock_gettime_settime.c
+	$(CC) $(CFLAGS) -c -o test_clock_gettime_settime.o test_clock_gettime_settime.c
 
+test_clock_gettime_settime64: test_clock_gettime_settime64.o
+	$(CC) $(CFLAGS) -o test_clock_gettime_settime64 test_clock_gettime_settime64.o $(SYSROOT)/usr/lib/libc.a
+	
 test_clock_gettime_settime64.o: test_clock_gettime_settime.c
-	$(CC) -c -o test_clock_gettime_settime64.o $(CFLAGS) -D_TIME_BITS=64 test_clock_gettime_settime.c
+	$(CC) $(CFLAGS) -c -o test_clock_gettime_settime64.o -D_TIME_BITS=64 test_clock_gettime_settime.c
 
 install: all
 	install -m 755 test_clock_gettime_settime $(INSTALL_DIR)
