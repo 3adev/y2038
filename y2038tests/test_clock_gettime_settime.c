@@ -69,6 +69,12 @@ static int print_glibc_version(void)
   return 0;
 }
 
+#if defined _TIME_BITS && _TIME_BITS == 64
+#define FMT "%ll"
+#else
+#define FMT "%l"
+#endif
+
 static int test_clock_gettime(struct timespec *tv)
 {
   int result = clock_gettime(CLOCK_REALTIME, tv);
@@ -81,8 +87,8 @@ static int test_clock_gettime(struct timespec *tv)
   }
   else
   {
-    printf("- tv.tv_sec = %llu (hex: %llx)\n", (long long) tv->tv_sec, (long long) tv->tv_sec);
-    printf("- tv.tv_nsec = %llu (hex: %llx)\n", (long long) tv->tv_nsec, (long long) tv->tv_nsec);
+    printf("- tv.tv_sec = " FMT "u (hex: " FMT "x)\n", tv->tv_sec, tv->tv_sec);
+    printf("- tv.tv_nsec = " FMT "u (hex: " FMT "x)\n", tv->tv_nsec, tv->tv_nsec);
     return 0;
   }
 }
@@ -90,8 +96,8 @@ static int test_clock_gettime(struct timespec *tv)
 static int test_clock_settime(struct timespec *tv)
 {
   printf("Calling clock_settime():\n");
-  printf("- tv.tv_sec = %llu (hex: %llx)\n", (long long) tv->tv_sec, (long long) tv->tv_sec);
-  printf("- tv.tv_nsec = %llu (hex: %llx)\n", (long long) tv->tv_nsec, (long long) tv->tv_nsec);
+  printf("- tv.tv_sec = " FMT "u (hex: " FMT "x)\n", tv->tv_sec, tv->tv_sec);
+  printf("- tv.tv_nsec = " FMT "u (hex: " FMT "x)\n", tv->tv_nsec, tv->tv_nsec);
   int result = clock_settime(CLOCK_REALTIME, tv);
   printf("clock_settime() returned %d\n", result);
   if (result)
@@ -114,15 +120,22 @@ static void test_clock_gettime_settime(void)
   printf("** Testing clock_gettime and clock_settime  **\n");
   printf("**********************************************\n");
   printf("\n");
-  printf("Size of time_t: %u bytes\n", sizeof(time_t)); 
   printf("Size of struct timespec: %u bytes\n", sizeof(struct timespec)); 
-  /* get current time, whatever it is */
+  printf("Current time for information:\n");
   test_clock_gettime(&tv);
-  /* test with current time just after Y2038 */
-  tv.tv_nsec = 0x7FFFFFFF;
-  tv.tv_nsec++;
+  printf("----------------------------------------------\n");
+  printf("Testing clock_settime() 1 minute before Y2038:\n");
+  tv.tv_sec = 0x7FFFFFFF;
+  tv.tv_sec -= 59;
+  tv.tv_nsec = 0;
   test_clock_settime(&tv);
-  /* get current time; what is it now? */
+  test_clock_gettime(&tv);
+  printf("----------------------------------------------\n");
+  printf("Testing clock_settime() 1 minute after Y2038:\n");
+  tv.tv_sec = 0x7FFFFFFF;
+  tv.tv_sec += 61;
+  tv.tv_nsec = 0;
+  test_clock_settime(&tv);
   test_clock_gettime(&tv);
   printf("\n");
   printf("**********************************************\n");
@@ -137,8 +150,6 @@ int main(int argc, char*argv[])
   if (!err) err = print_glibc_version();
   
   test_clock_gettime_settime();
-
-  while(1);
 
   return 0;
 }
