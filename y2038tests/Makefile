@@ -12,17 +12,18 @@
 .PHONY: all install clean
 
 CFLAGS += --sysroot=$(SYSROOT) -isystem =/usr/include -g
+LDCFLAGS += --sysroot=$(SYSROOT) -isystem =/usr/include -L=/lib -L=/usr/lib -g
 
 all: test_clock_gettime_settime test_clock_gettime_settime64
 
 test_clock_gettime_settime: test_clock_gettime_settime.o
-	$(CC) $(CFLAGS) -o test_clock_gettime_settime test_clock_gettime_settime.o
+	$(CC) $(LDCFLAGS) -o test_clock_gettime_settime test_clock_gettime_settime.o
 
 test_clock_gettime_settime.o: test_clock_gettime_settime.c
 	$(CC) $(CFLAGS) -c -o test_clock_gettime_settime.o test_clock_gettime_settime.c
 
 test_clock_gettime_settime64: test_clock_gettime_settime64.o
-	$(CC) $(CFLAGS) -static -o test_clock_gettime_settime64 test_clock_gettime_settime64.o $(SYSROOT)/usr/lib/libc.a
+	$(CC) $(LDCFLAGS) -o test_clock_gettime_settime64 test_clock_gettime_settime64.o
 	
 test_clock_gettime_settime64.o: test_clock_gettime_settime.c
 	$(CC) $(CFLAGS) -c -o test_clock_gettime_settime64.o -D_TIME_BITS=64 test_clock_gettime_settime.c
