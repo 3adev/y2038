@@ -14,13 +14,14 @@
 
 # Main directories. Make them available to sub-Makefiles if needed
 
-export KERNEL_DIR       := $(PWD)/linux
-export GLIBC_SOURCE_DIR := $(PWD)/glibc/src
-export GLIBC_BUILD_DIR  := $(PWD)/glibc/build
-export ROOTFS_DIR       := $(PWD)/rootfs
-export BUSYBOX_DIR      := $(PWD)/busybox
-export Y2038TESTS_DIR   := $(PWD)/y2038tests
-export KERNEL_HDR_DIR   := $(ROOTFS_DIR)/usr
+export KERNEL_SOURCE_DIR := $(PWD)/linux/src
+export KERNEL_BUILD_DIR  := $(PWD)/linux/build
+export GLIBC_SOURCE_DIR  := $(PWD)/glibc/src
+export GLIBC_BUILD_DIR   := $(PWD)/glibc/build
+export ROOTFS_DIR        := $(PWD)/rootfs
+export BUSYBOX_DIR       := $(PWD)/busybox
+export Y2038TESTS_DIR    := $(PWD)/y2038tests
+export KERNEL_HDR_DIR    := $(ROOTFS_DIR)/usr
 
 # This one is used in GLIBC rules below
 
@@ -50,7 +51,7 @@ GLIBC_HOST = $(TARGET_ARCH)
 # BUSYBOX
 
 BUSYBOX_GIT = git://busybox.net/busybox.git
-BUSYBOX_COMMIT = master
+BUSYBOX_COMMIT = 1_26_1
 
 # QEMU
 
@@ -75,7 +76,7 @@ clean:
 # NOTE GLIBC's clean target is *very slow*. It's just faster
 # to simply delete the GLIBC build dir.
 clean-all: clean
-	$(MAKE) -C $(KERNEL_DIR) clean
+	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR) clean
 	rm -rf $(GLIBC_BUILD_DIR)
 	$(MAKE) -C $(BUSYBOX_DIR) clean
 	$(MAKE) -C $(Y2038TESTS_DIR) clean
@@ -85,27 +86,29 @@ clean-all: clean
 #---------------------------------------------------------------------------
 
 # Target (sub)component files
-KERNEL_IMAGE = $(KERNEL_DIR)/arch/$(ARCH)/boot/zImage
-KERNEL_DTB = $(KERNEL_DIR)/arch/$(ARCH)/boot/dts/$(KERNEL_DEVICE_TREE).dtb
+KERNEL_IMAGE = $(KERNEL_BUILD_DIR)/arch/$(ARCH)/boot/zImage
+KERNEL_DTB = $(KERNEL_BUILD_DIR)/arch/$(ARCH)/boot/dts/$(KERNEL_DEVICE_TREE).dtb
 KERNEL_HDR = $(KERNEL_HDR_DIR)/include/linux/version.h
 
 # How to fetch the component
-$(KERNEL_DIR):
-	git clone $(KERNEL_GIT) $(KERNEL_DIR)
-	cd $(KERNEL_DIR) && git checkout $(KERNEL_COMMIT)
+$(KERNEL_SOURCE_DIR):
+	mkdir -p $(KERNEL_SOURCE_DIR)
+	git clone $(KERNEL_GIT) $(KERNEL_SOURCE_DIR)
+	cd $(KERNEL_SOURCE_DIR) && git checkout $(KERNEL_COMMIT)
 
 # How to configure the component
-$(KERNEL_DIR)/.config: configs/kernel-$(ARCH)-defconfig | $(KERNEL_DIR)
-	cp -f configs/kernel-$(ARCH)-defconfig $(KERNEL_DIR)/.config
-	$(MAKE) -C $(KERNEL_DIR) olddefconfig
+$(KERNEL_BUILD_DIR)/.config: configs/kernel-$(ARCH)-defconfig | $(KERNEL_SOURCE_DIR)
+	mkdir -p $(KERNEL_BUILD_DIR)
+	cp -f configs/kernel-$(ARCH)-defconfig $(KERNEL_BUILD_DIR)/.config
+	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR) olddefconfig
 
 # How to build the component
-$(KERNEL_IMAGE): $(KERNEL_DIR)/.config
-	$(MAKE) -C $(KERNEL_DIR)  zImage
+$(KERNEL_IMAGE): $(KERNEL_BUILD_DIR)/.config
+	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR) zImage
 
 # How to build the device tree for the image
-$(KERNEL_DTB): $(KERNEL_DIR)/.config
-	$(MAKE) -C $(KERNEL_DIR) dtbs
+$(KERNEL_DTB): $(KERNEL_BUILD_DIR)/.config
+	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR) dtbs
 
 # pseudo targets to build all only the kernel, only the dtbs, all of
 # linux
@@ -191,7 +194,7 @@ y2038tests: $(ROOTFS_LIBS)
 # how to install the kernel headers in the rootfs
 
 $(KERNEL_HDR): $(KERNEL_IMAGE)
-	mkdir -p $(KERNEL_HDR_DIR) && $(MAKE) -C $(KERNEL_DIR) INSTALL_HDR_PATH=$(KERNEL_HDR_DIR) headers_install
+	mkdir -p $(KERNEL_HDR_DIR) && $(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR) INSTALL_HDR_PATH=$(KERNEL_HDR_DIR) headers_install
 
 # how to install GLIBC in the rootfs
 
