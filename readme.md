@@ -15,7 +15,7 @@ Linux system composed of:
 * an unmodified busybox build taken from `git://busybox.net/busybox.git`
   on branch `master`;
 
-* a minimal root file system skeleton located in subdirectory `rootfs/`;
+* a minimal root file system skeleton;
 
 * various Y2038 test programs located in subdirectory `y2038tests/`;
 
@@ -23,23 +23,33 @@ Linux system composed of:
   root file system and test programs into a single system image which
   can run under QEMU.
 
+There are actually two builds of the kernel, one with Y2038 support and
+one without, and two images built accordingly. This is done so that the
+Y2038-enabled GLIBC can be run over both kernels and the results compared.
+
+Various symbols in the Makefile have a '_Y2038' or '-y2038' suffix for
+the Y2038-aware version (e.g. patched kernel) and a '_N2038' or '-n2038'
+for the non-Y2038-aware version (e.g. unpatched kernel).
+
+In the following, `-[yn]2038` means either `-y2038`  or `-n2038`.
+
 # How to use it
 
-cd into subdirectory `image/` then run `make qemu`. This will (slowly)
+cd into the repository root then run `make qemu`. This will (slowly)
 build a Y2038 kernel, a Y2038 GLIBC, busybox, the root image, and in the
 end, qemu.
 
 There are pseudo targets to (re)build specific parts of the image
 (see `Makefile` for details):
 
-* `kernel` builds the kernel image
-* `dtbs` builds the kernel device trees
-* `linux` builds all of the kernel, `linux-install` installs it in rootfs
+* `kernel-[yn]2038` builds the kernel image
+* `dtbs-[yn]2038` builds the kernel device trees
+* `linux-[yn]2038` builds all of the kernel, `linux-install` installs it in rootfs
 * `glibc` builds the GLIBC library, `glibc-install` installs it in rootfs
 * `busybox` builds the busybox library, `busybox-install` installs it in rootfs
 * `y2038tests` builds application test code for Y2038 test cases
-* `rootfs` builds the rootfs itself (includes all of the installs above)
-* `qemu` runs the image under QEMU
+* `rootfs-[yn]2038` builds the rootfs itself (includes all of the installs above)
+* `qemu-[yn]2038` runs the image under QEMU
 
 Within the image, test applications can be run, and will use the kernel
 and GLIBC of the image of course; they are stored in `/usr/local/bin`.
