@@ -9,65 +9,8 @@
 #include <stdint.h>
 #include <asm/unistd.h>
 
-/**
- * Print the kernel version
- *
- * @return 0 if OK
- */
-static int print_kernel_version(void)
-{
-  struct utsname utsname;
-  if (uname(&utsname) < 0)
-  {
-	  printf("uname() failed with error %d (%s)\n", errno, strerror(errno));
-	  return 1;
-  }
-  printf("uname() result:\n");
-  printf("- sysname      : %s\n", utsname.sysname);
-  printf("- nodename     : %s\n", utsname.nodename);
-  printf("- release      : %s\n", utsname.release);
-  printf("- version      : %s\n", utsname.version);
-  printf("- machine      : %s\n", utsname.machine);
-  return 0;
-}
-
-static int print_glibc_version(void)
-{
-  char *confbuf;
-  int conflen;
-
-  conflen = confstr(  _CS_GNU_LIBC_VERSION, NULL, 0);
-  if (!conflen)
-  {
-	  printf("confstr(_CS_GNU_LIBC_VERSION, NULL, 0) failed with error %d (%s)\n", errno, strerror(errno));
-	  return 1;
-  }
-
-
-  conflen = confstr(  _CS_GNU_LIBC_VERSION, NULL, 0);
-  if (!conflen)
-  {
-	  printf("confstr(_CS_GNU_LIBC_VERSION, NULL, 0) failed with error %d (%s)\n", errno, strerror(errno));
-	  return 1;
-  }
-
-  confbuf = malloc(conflen);
-  if (!confbuf)
-  {
-	  printf("malloc(%d) failed with error %d (%s)\n", conflen, errno, strerror(errno));
-	  return 1;
-  }
-
-  if (conflen != confstr(  _CS_GNU_LIBC_VERSION, confbuf, conflen))
-  {
-	  printf("confstr(_CS_GNU_LIBC_VERSION, %p, %d) failed with error %d (%s)\n", confbuf, conflen, errno, strerror(errno));
-	  return 1;
-  }
-
-  printf("confstr() result:\n");
-  printf("- LIBC version: %s\n", confbuf);
-  return 0;
-}
+#include "id_kernel.h"
+#include "id_glibc.h"
 
 #if defined _TIME_BITS && _TIME_BITS == 64
 #define FMT "%ll"
