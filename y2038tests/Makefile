@@ -14,7 +14,7 @@
 CFLAGS += --sysroot=$(SYSROOT) -isystem =/usr/include -g
 LDCFLAGS += --sysroot=$(SYSROOT) -isystem =/usr/include -L=/lib -L=/usr/lib -g
 
-all: test_clock_gettime_settime test_clock_gettime_settime64
+all: test_clock_gettime_settime test_clock_gettime_settime64 test_difftime64
 
 test_clock_gettime_settime: test_clock_gettime_settime.o
 	$(CC) $(LDCFLAGS) -o test_clock_gettime_settime test_clock_gettime_settime.o
@@ -28,10 +28,17 @@ test_clock_gettime_settime64: test_clock_gettime_settime64.o
 test_clock_gettime_settime64.o: test_clock_gettime_settime.c
 	$(CC) $(CFLAGS) -c -o test_clock_gettime_settime64.o -D_TIME_BITS=64 test_clock_gettime_settime.c
 
+test_difftime64: test_difftime64.o
+	$(CC) $(LDCFLAGS) -o test_difftime64 test_difftime64.o
+	
+test_difftime64.o: test_difftime.c
+	$(CC) $(CFLAGS) -c -o test_difftime64.o -D_TIME_BITS=64 test_difftime.c
+
 install: all
 	install -m 755 test_clock_gettime_settime $(INSTALL_DIR)
 	install -m 755 test_clock_gettime_settime64 $(INSTALL_DIR)
+	install -m 755 test_difftime64 $(INSTALL_DIR)
 
 clean:
-	rm -f test_clock_gettime_settime test_clock_gettime_settime64
-	rm -f test_clock_gettime_settime.o test_clock_gettime_settime64.o
+	rm -f test_clock_gettime_settime test_clock_gettime_settime64 test_difftime64
+	rm -f test_clock_gettime_settime.o test_clock_gettime_settime64.o test_difftime64.o
