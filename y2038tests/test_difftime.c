@@ -6,43 +6,43 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
-#include <stdint.h>
+#include <inttypes.h>
 #include <asm/unistd.h>
 
 #include "id_kernel.h"
 #include "id_glibc.h"
 
 #if defined _TIME_BITS && _TIME_BITS == 64
-#define FMT "%ll"
+#define FMTD "%" PRId64
 #else
-#define FMT "%l"
+#define FMTD "%" PRId32
 #endif
 
 static int test_difftime_call(time64_t time1, time64_t time0)
 {
   long double result = difftime64(time1, time0);
-  printf("diftime(" FMT "d, " FMT "d) returned %Lg\n", time1, time0, result);
+  printf("diftime(" FMTD ", " FMTD ") returned %Lg\n", time1, time0, result);
 }
 
 static void test_difftime(void)
 {
   printf("\n");
   printf("**********************************************\n");
-  printf("** Testing clock_difftime                   **\n");
+  printf("** Testing difftime                         **\n");
   printf("**********************************************\n");
   printf("\n");
-  printf("Size of time64_t: %u bytes\n", sizeof(time64_t)); 
+  printf("Size of time64_t: %zu bytes\n", sizeof(time64_t)); 
   printf("----------------------------------------------\n");
   printf("Testing difftime() for time1 and time0 before Y2038:\n");
-  test_difftime_call(3600ull, 7200ull);
-  test_difftime_call(7200ull, 3600ull);
+  test_difftime_call(3600ll, 7200ll);
+  test_difftime_call(7200ll, 3600ll);
   printf("----------------------------------------------\n");
-  printf("Testing difftime() for time1 and time0 before Y2038:\n");
-  test_difftime_call(0x90000000ull+3600ull, 0x90000000ull+7200ull);
-  test_difftime_call(0x90000000ull+7200ull, 0x90000000ull+3600ull);
+  printf("Testing difftime() for time1 and time0 after Y2038:\n");
+  test_difftime_call(0x90000000dll+3600ll, 0x90000000dll+7200ll);
+  test_difftime_call(0x90000000dll+7200ll, 0x90000000dll+3600ll);
   printf("\n");
   printf("**********************************************\n");
-  printf("** Tested clock_gettime and clock_settime  **\n");
+  printf("** Tested difftime                          **\n");
   printf("**********************************************\n");
   printf("\n");
 }

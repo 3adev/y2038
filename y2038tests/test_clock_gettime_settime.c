@@ -4,16 +4,18 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <time.h>
-#include <stdint.h>
+#include <inttypes.h>
 #include <asm/unistd.h>
 
 #include "id_kernel.h"
 #include "id_glibc.h"
 
 #if defined _TIME_BITS && _TIME_BITS == 64
-#define FMT "%ll"
+#define FMTX "%" PRIx64
+#define FMTD "%" PRId64
 #else
-#define FMT "%l"
+#define FMTX "%" PRIx32
+#define FMTD "%" PRId32
 #endif
 
 static int test_clock_gettime(struct timespec *tv)
@@ -28,8 +30,8 @@ static int test_clock_gettime(struct timespec *tv)
   }
   else
   {
-    printf("- tv.tv_sec = " FMT "u (hex: " FMT "x)\n", tv->tv_sec, tv->tv_sec);
-    printf("- tv.tv_nsec = " FMT "u (hex: " FMT "x)\n", tv->tv_nsec, tv->tv_nsec);
+    printf("- tv.tv_sec = " FMTD " (hex: " FMTX ")\n", tv->tv_sec, tv->tv_sec);
+    printf("- tv.tv_nsec = " FMTD " (hex: " FMTX ")\n", tv->tv_nsec, tv->tv_nsec);
     return 0;
   }
 }
@@ -37,8 +39,8 @@ static int test_clock_gettime(struct timespec *tv)
 static int test_clock_settime(struct timespec *tv)
 {
   printf("Calling clock_settime():\n");
-  printf("- tv.tv_sec = " FMT "u (hex: " FMT "x)\n", tv->tv_sec, tv->tv_sec);
-  printf("- tv.tv_nsec = " FMT "u (hex: " FMT "x)\n", tv->tv_nsec, tv->tv_nsec);
+  printf("- tv.tv_sec = " FMTD " (hex: " FMTX ")\n", tv->tv_sec, tv->tv_sec);
+  printf("- tv.tv_nsec = " FMTD " (hex: " FMTX ")\n", tv->tv_nsec, tv->tv_nsec);
   int result = clock_settime(CLOCK_REALTIME, tv);
   printf("clock_settime() returned %d\n", result);
   if (result)
@@ -61,7 +63,7 @@ static void test_clock_gettime_settime(void)
   printf("** Testing clock_gettime and clock_settime  **\n");
   printf("**********************************************\n");
   printf("\n");
-  printf("Size of struct timespec: %u bytes\n", sizeof(struct timespec)); 
+  printf("Size of struct timespec: %zu bytes\n", sizeof(struct timespec)); 
   printf("Current time for information:\n");
   test_clock_gettime(&tv);
   printf("----------------------------------------------\n");
