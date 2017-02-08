@@ -54,7 +54,7 @@ static int test_clock_settime(struct timespec *tv)
 static void test_clock_gettime_settime(void)
 {
   struct timespec tv;
-
+  check_kernel_timekeeping();
   memset(&tv, 0x55, sizeof(tv));
   printf("\n");
   printf("**********************************************\n");
