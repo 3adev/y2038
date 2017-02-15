@@ -273,7 +273,7 @@ glibc-install-y2038: $(ROOTFS_LIBS_Y2038)
 busybox-install-y2038: $(ROOTFS_INIT_Y2038)
 
 y2038tests-install-y2038: y2038tests
-	$(MAKE) -C $(Y2038TESTS_DIR) install INSTALL_DIR=$(ROOTFS_DIR_Y2038)/usr/local/bin SYSROOT=$(ROOTFS_DIR_Y2038)
+	$(MAKE) -C $(Y2038TESTS_DIR) install INSTALL_DIR=$(ROOTFS_DIR_Y2038)/usr/bin SYSROOT=$(ROOTFS_DIR_Y2038)
 
 linux-install-n2038: linux-n2038 $(KERNEL_HDR_N2038)
 
@@ -282,7 +282,7 @@ glibc-install-n2038: $(ROOTFS_LIBS_N2038)
 busybox-install-n2038: $(ROOTFS_INIT_N2038)
 
 y2038tests-install-n2038: y2038tests
-	$(MAKE) -C $(Y2038TESTS_DIR) install INSTALL_DIR=$(ROOTFS_DIR_N2038)/usr/local/bin SYSROOT=$(ROOTFS_DIR_N2038)
+	$(MAKE) -C $(Y2038TESTS_DIR) install INSTALL_DIR=$(ROOTFS_DIR_N2038)/usr/bin SYSROOT=$(ROOTFS_DIR_N2038)
 
 #---------------------------------------------------------------------------
 # INITRAMFS
