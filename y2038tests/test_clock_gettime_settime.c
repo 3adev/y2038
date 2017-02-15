@@ -11,90 +11,66 @@
 #include "id_glibc.h"
 
 #if defined _TIME_BITS && _TIME_BITS == 64
-#define FMTX "%" PRIx64
-#define FMTD "%" PRId64
+#define FMTD "%lld"
 #else
-#define FMTX "%" PRIx32
-#define FMTD "%" PRId32
+#define FMTD "%ld"
 #endif
 
-static int test_clock_gettime(struct timespec *tv)
+static int test_clock_gettime(struct timespec *tv, time_t sec)
 {
   int result = clock_gettime(CLOCK_REALTIME, tv);
-  printf("clock_gettime() returned %d\n", result);
   if (result)
   {
-	  printf("- errno = %d\n", errno);
-	  printf("- strerror(errno) =\"%s\"\n", strerror(errno));
-	  return 1;
+    printf("clock_gettime() returned %d (errno %d '%s')\n",
+      result, errno, strerror(errno));
+    return 1;
   }
-  else
+  if (tv->tv_sec != sec)
   {
-    printf("- tv.tv_sec = " FMTD " (hex: " FMTX ")\n", tv->tv_sec, tv->tv_sec);
-    printf("- tv.tv_nsec = " FMTD " (hex: " FMTX ")\n", tv->tv_nsec, tv->tv_nsec);
-    return 0;
+    printf("clock_gettime() returned tv_sec = " FMTD " instead of "
+      FMTD "\n", tv->tv_sec, sec);
+    return 1;
   }
+  return 0;
 }
 
 static int test_clock_settime(struct timespec *tv)
 {
-  printf("Calling clock_settime():\n");
-  printf("- tv.tv_sec = " FMTD " (hex: " FMTX ")\n", tv->tv_sec, tv->tv_sec);
-  printf("- tv.tv_nsec = " FMTD " (hex: " FMTX ")\n", tv->tv_nsec, tv->tv_nsec);
   int result = clock_settime(CLOCK_REALTIME, tv);
-  printf("clock_settime() returned %d\n", result);
   if (result)
   {
-	  printf("- errno = %d\n", errno);
-	  printf("- strerror(errno) =\"%s\"\n", strerror(errno));
+	  printf("clock_settime(" FMTD "," FMTD ") returned %d (errno %d '%s')\n",
+        tv->tv_sec, tv->tv_nsec, result, errno, strerror(errno));
 	  return 1;
   }
-  else
-    return 0;
-}
-
-static void test_clock_gettime_settime(void)
-{
-  struct timespec tv;
-  check_kernel_timekeeping();
-  memset(&tv, 0x55, sizeof(tv));
-  printf("\n");
-  printf("**********************************************\n");
-  printf("** Testing clock_gettime and clock_settime  **\n");
-  printf("**********************************************\n");
-  printf("\n");
-  printf("Size of struct timespec: %zu bytes\n", sizeof(struct timespec)); 
-  printf("Current time for information:\n");
-  test_clock_gettime(&tv);
-  printf("----------------------------------------------\n");
-  printf("Testing clock_settime() 1 minute before Y2038:\n");
-  tv.tv_sec = 0x7FFFFFFF;
-  tv.tv_sec -= 59;
-  tv.tv_nsec = 0;
-  test_clock_settime(&tv);
-  test_clock_gettime(&tv);
-  printf("----------------------------------------------\n");
-  printf("Testing clock_settime() 1 minute after Y2038:\n");
-  tv.tv_sec = 0x7FFFFFFF;
-  tv.tv_sec += 61;
-  tv.tv_nsec = 0;
-  test_clock_settime(&tv);
-  test_clock_gettime(&tv);
-  printf("\n");
-  printf("**********************************************\n");
-  printf("** Tested clock_gettime and clock_settime  **\n");
-  printf("**********************************************\n");
-  printf("\n");
-}
-
-int main(int argc, char*argv[])
-{ 
-  int err = print_kernel_version();
-  if (!err) err = print_glibc_version();
-  
-  test_clock_gettime_settime();
-
   return 0;
 }
 
+void test_clock_gettime_settime(int *tests_run, int *tests_fail)
+{
+  struct timespec tv;
 
+  memset(&tv, 0x55, sizeof(tv));
+  int result = clock_gettime(CLOCK_REALTIME, &tv);
+  (*tests_run)++;
+  if (result)
+  {
+    printf("clock_gettime() returned %d (errno %d '%s')\n",
+      result, errno, strerror(errno));
+    (*tests_fail)++;
+  }
+
+  tv.tv_sec = 0x7FFFFFFF;
+  tv.tv_sec -= 59;
+  tv.tv_nsec = 0;
+  result = test_clock_settime(&tv);
+  if (result == 0) result = test_clock_gettime(&tv, tv.tv_sec);
+  (*tests_run)++; (*tests_fail) += result;
+
+  tv.tv_sec = 0x7FFFFFFF;
+  tv.tv_sec += 61;
+  tv.tv_nsec = 0;
+  result = test_clock_settime(&tv);
+  if (result == 0) result = test_clock_gettime(&tv, tv.tv_sec);
+  (*tests_run)++; (*tests_fail) += result;
+}

@@ -13,48 +13,34 @@
 #include "id_glibc.h"
 
 #if defined _TIME_BITS && _TIME_BITS == 64
-#define FMTD "%" PRId64
+#define FMTD "%lld"
 #else
-#define FMTD "%" PRId32
+#define FMTD "%ld"
 #endif
 
-static int test_difftime_call(time64_t time1, time64_t time0)
+static int test_difftime_call(
+  time_t time1,
+  time_t time0,
+  long double expected_result)
 {
   long double result = difftime64(time1, time0);
-  printf("diftime(" FMTD ", " FMTD ") returned %Lg\n", time1, time0, result);
-}
-
-static void test_difftime(void)
-{
-  printf("\n");
-  printf("**********************************************\n");
-  printf("** Testing difftime                         **\n");
-  printf("**********************************************\n");
-  printf("\n");
-  printf("Size of time64_t: %zu bytes\n", sizeof(time64_t)); 
-  printf("----------------------------------------------\n");
-  printf("Testing difftime() for time1 and time0 before Y2038:\n");
-  test_difftime_call(3600ll, 7200ll);
-  test_difftime_call(7200ll, 3600ll);
-  printf("----------------------------------------------\n");
-  printf("Testing difftime() for time1 and time0 after Y2038:\n");
-  test_difftime_call(0x90000000dll+3600ll, 0x90000000dll+7200ll);
-  test_difftime_call(0x90000000dll+7200ll, 0x90000000dll+3600ll);
-  printf("\n");
-  printf("**********************************************\n");
-  printf("** Tested difftime                          **\n");
-  printf("**********************************************\n");
-  printf("\n");
-}
-
-int main(int argc, char*argv[])
-{ 
-  int err = print_kernel_version();
-  if (!err) err = print_glibc_version();
-  
-  test_difftime();
-
+  if (result != expected_result)
+  {
+    printf("difftime(" FMTD ", " FMTD ") returned %Lg instead of %Lg\n",
+      time1, time0, result, expected_result);
+      return 1;
+  }
   return 0;
 }
 
-
+void test_difftime(int *tests_run, int *tests_fail)
+{
+  int result = test_difftime_call(3600, 7200, -3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+  result = test_difftime_call(7200, 3600, 3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+  result = test_difftime_call(0x80000000-1800, 0x80000000+1800, -3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+  result = test_difftime_call(0x80000000+1800, 0x80000000-1800, +3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+}
