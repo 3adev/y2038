@@ -72,8 +72,10 @@ all: initramfs-y2038
 
 # clean only cleans the rootfs and initramfs 
 clean:
-	git clean -xfd rootfs
-	rm -f initramfs
+	git clean -xfd rootfs-n2038
+	git clean -xfd rootfs-y2038
+	rm -f initramfs-n2038
+	rm -f initramfs-y2038
 
 # clean-all cleans and asks for subprojects to clean
 # NOTE GLIBC's clean target is *very slow*. It's just faster
