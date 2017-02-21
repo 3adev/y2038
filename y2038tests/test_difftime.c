@@ -15,12 +15,12 @@
 static int test_difftime_call(
   time_t time1,
   time_t time0,
-  long double expected_result)
+  double expected_result)
 {
-  long double result = difftime(time1, time0);
+  double result = difftime(time1, time0);
   if (result != expected_result)
   {
-    printf("difftime(" FMTD ", " FMTD ") returned %Lg instead of %Lg\n",
+    printf("difftime(" FMTD ", " FMTD ") returned %g instead of %g\n",
       time1, time0, result, expected_result);
       return 1;
   }
@@ -29,12 +29,18 @@ static int test_difftime_call(
 
 void test_difftime(int *tests_run, int *tests_fail)
 {
-  int result = test_difftime_call(3600, 7200, -3600.0);
+  time_t time1, time0;
+  int result;
+  time1 = +1800; time0 = -1800; result = test_difftime_call(time1, time0, +3600.0);
   (*tests_run)++; (*tests_fail) += result;
-  result = test_difftime_call(7200, 3600, 3600.0);
+  time1 = -1800; time0 = +1800; result = test_difftime_call(time1, time0, -3600.0);
   (*tests_run)++; (*tests_fail) += result;
-  result = test_difftime_call(0x80000000-1800, 0x80000000+1800, -3600.0);
+  time1 = time0 = 0x7FFFFFFF; time1 += 1800; time0 -= 1800; result = test_difftime_call(time1, time0, +3600.0);
   (*tests_run)++; (*tests_fail) += result;
-  result = test_difftime_call(0x80000000+1800, 0x80000000-1800, +3600.0);
+  time1 = time0 = 0x80000000; time1 += 1800; time0 -= 1800; result = test_difftime_call(time1, time0, +3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+  time1 = time0 = 0x80000000; time1 -= 1800; time0 += 1800; result = test_difftime_call(time1, time0, -3600.0);
+  (*tests_run)++; (*tests_fail) += result;
+  time1 = time0 = 0x7FFFFFFF; time1 -= 1800; time0 += 1800; result = test_difftime_call(time1, time0, -3600.0);
   (*tests_run)++; (*tests_fail) += result;
 }
