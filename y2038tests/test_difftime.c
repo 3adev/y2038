@@ -1,13 +1,7 @@
+#include <time.h>
 #include <stdio.h>
-#include <sys/utsname.h>
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <time.h>
-#include <inttypes.h>
-#include <asm/unistd.h>
 
 #include "id_kernel.h"
 #include "id_glibc.h"
@@ -23,7 +17,7 @@ static int test_difftime_call(
   time_t time0,
   long double expected_result)
 {
-  long double result = difftime64(time1, time0);
+  long double result = difftime(time1, time0);
   if (result != expected_result)
   {
     printf("difftime(" FMTD ", " FMTD ") returned %Lg instead of %Lg\n",

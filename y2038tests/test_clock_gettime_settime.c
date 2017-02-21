@@ -1,11 +1,7 @@
+#include <time.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <time.h>
-#include <inttypes.h>
-#include <asm/unistd.h>
 
 #include "id_kernel.h"
 #include "id_glibc.h"
