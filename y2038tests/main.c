@@ -2,9 +2,9 @@
 #include "id_kernel.h"
 #include "id_glibc.h"
 #include "test_clock_gettime_settime.h"
-#include "test_difftime.h"
 #include "test_ctime.h"
-
+#include "test_difftime.h"
+#include "test_gmtime.h"
 
 int main(int argc, char*argv[])
 { 
@@ -20,6 +20,7 @@ int main(int argc, char*argv[])
   test_clock_gettime_settime(&tests_run, &tests_fail);
   test_difftime(&tests_run, &tests_fail);
   test_ctime(&tests_run, &tests_fail);
+  test_gmtime(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)
