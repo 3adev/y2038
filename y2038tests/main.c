@@ -6,6 +6,8 @@
 #include "test_difftime.h"
 #include "test_gmtime.h"
 #include "test_gmtime_r.h"
+#include "test_mktime.h"
+#include "test_ctime_r.h"
 
 int main(int argc, char*argv[])
 { 
@@ -23,6 +25,8 @@ int main(int argc, char*argv[])
   test_ctime(&tests_run, &tests_fail);
   test_gmtime(&tests_run, &tests_fail);
   test_gmtime_r(&tests_run, &tests_fail);
+  test_mktime(&tests_run, &tests_fail);
+  test_ctime_r(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)
