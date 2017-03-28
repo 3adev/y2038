@@ -35,9 +35,9 @@ static int test_clock_settime(struct timespec *tv)
   int result = clock_settime(CLOCK_REALTIME, tv);
   if (result)
   {
-	  printf("clock_settime(" FMTD "," FMTD ") returned %d (errno %d '%s')\n",
-        tv->tv_sec, tv->tv_nsec, result, errno, strerror(errno));
-	  return 1;
+    printf("clock_settime(" FMTD ",%ld) returned %d (errno %d '%s')\n",
+           tv->tv_sec, tv->tv_nsec, result, errno, strerror(errno));
+    return 1;
   }
   return 0;
 }
