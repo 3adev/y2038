@@ -12,6 +12,24 @@
 #define FMTD "%ld"
 #endif
 
+static int test_clock_getres(struct timespec *tv, time_t sec)
+{
+  int result = clock_getres(CLOCK_REALTIME, tv);
+  if (result)
+  {
+    printf("clock_getres() returned %d (errno %d '%s')\n",
+      result, errno, strerror(errno));
+    return 1;
+  }
+  if (tv->tv_sec != sec)
+  {
+    printf("clock_getres() returned tv_sec = " FMTD " instead of "
+      FMTD "\n", tv->tv_sec, sec);
+    return 1;
+  }
+  return 0;
+}
+
 static int test_clock_gettime(struct timespec *tv, time_t sec)
 {
   int result = clock_gettime(CLOCK_REALTIME, tv);
@@ -55,6 +73,11 @@ void test_clock_gettime_settime(int *tests_run, int *tests_fail)
       result, errno, strerror(errno));
     (*tests_fail)++;
   }
+
+  tv.tv_sec = 0;
+  tv.tv_nsec = 0;
+  result = test_clock_getres(&tv, 0);
+  (*tests_run)++; (*tests_fail) += result;
 
   tv.tv_sec = 0x7FFFFFFF;
   tv.tv_sec -= 59;
