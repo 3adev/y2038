@@ -9,6 +9,7 @@
 #include "test_mktime.h"
 #include "test_ctime_r.h"
 #include "test_timegm.h"
+#include "test_clock_nanosleep.h"
 
 int main(int argc, char*argv[])
 { 
@@ -29,6 +30,7 @@ int main(int argc, char*argv[])
   test_mktime(&tests_run, &tests_fail);
   test_ctime_r(&tests_run, &tests_fail);
   test_timegm(&tests_run, &tests_fail);
+  test_clock_nanosleep(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)
