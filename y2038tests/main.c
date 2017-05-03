@@ -13,6 +13,7 @@
 #include "test_timespec_get.h"
 #include "test_futimens.h"
 #include "test_utimensat.h"
+#include "test_timer_gettime_settime.h"
 
 int main(int argc, char*argv[])
 { 
@@ -37,6 +38,7 @@ int main(int argc, char*argv[])
   test_timespec_get(&tests_run, &tests_fail);
   test_futimens(&tests_run, &tests_fail);
   test_utimensat(&tests_run, &tests_fail);
+  test_timer_gettime_settime(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)

@@ -18,11 +18,11 @@ all: test_y2038 test_n2038
 
 test_y2038: $(patsubst %.c,%.64.o,$(wildcard *.c)) 
 	@echo "LD64  $^"
-	@$(CC) $(LDCFLAGS) -o test_y2038 $^
+	@$(CC) $(LDCFLAGS) -o test_y2038 $^ -lrt
 
 test_n2038: $(patsubst %.c,%.32.o,$(wildcard *.c))
 	@echo "LD32  $^"
-	@$(CC) $(LDCFLAGS) -o test_n2038 $^
+	@$(CC) $(LDCFLAGS) -o test_n2038 $^ -lrt
 
 %.64.o: %.c %.64.d
 	@echo "CC64  $<"
