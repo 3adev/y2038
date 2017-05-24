@@ -17,6 +17,7 @@
 #include "test_timerfd_gettime_settime.h"
 #include "test_stat.h"
 #include "test_fstat.h"
+#include "test_lstat.h"
 
 int main(int argc, char*argv[])
 { 
@@ -45,6 +46,7 @@ int main(int argc, char*argv[])
   test_timerfd_gettime_settime(&tests_run, &tests_fail);
   test_stat(&tests_run, &tests_fail);
   test_fstat(&tests_run, &tests_fail);
+  test_lstat(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)
