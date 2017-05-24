@@ -18,6 +18,7 @@
 #include "test_stat.h"
 #include "test_fstat.h"
 #include "test_lstat.h"
+#include "test_fstatat.h"
 
 int main(int argc, char*argv[])
 { 
@@ -47,6 +48,7 @@ int main(int argc, char*argv[])
   test_stat(&tests_run, &tests_fail);
   test_fstat(&tests_run, &tests_fail);
   test_lstat(&tests_run, &tests_fail);
+  test_fstatat(&tests_run, &tests_fail);
   printf("------------------------------------------\n");
 
   if (tests_run == 0)
