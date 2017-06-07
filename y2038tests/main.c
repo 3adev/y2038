@@ -31,6 +31,7 @@
 #include "test_nanosleep.h"
 #include "test_adjtime.h"
 #include "test_utime.h"
+#include "test_set_getitimer.h"
 
 int main(int argc, char*argv[])
 { 
@@ -70,6 +71,7 @@ int main(int argc, char*argv[])
   test_nanosleep();
   test_adjtime();
   test_utime();
+  test_set_getitimer();
 
   tests_report();
 
