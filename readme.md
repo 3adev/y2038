@@ -10,7 +10,7 @@ Linux system composed of:
   branch `y2038-4.8`;
 
 * the GLIBC libary with in-progress Y2038 support as available from
-  `git://sourceware.org/git/glibc.git` in branch `aaribaud/y2038`;
+  `git://sourceware.org/git/glibc.git` in branch `aaribaud/y2038-2.25`;
 
 * an unmodified busybox build taken from `git://busybox.net/busybox.git`
   on branch `master`;
@@ -52,7 +52,14 @@ There are pseudo targets to (re)build specific parts of the image
 * `qemu-[yn]2038` runs the image under QEMU
 
 Within the image, test applications can be run, and will use the kernel
-and GLIBC of the image of course; they are stored in `/usr/local/bin`.
+and GLIBC of the image of course; they are stored in `/usr/bin` and are
+called `test_y2038` (built  with `-DTIME_BITS=64` and thus expecting to
+use Y2038-proof APIs) and `test_n2038` (built without `-DTIMEBITS=64` and
+thus expecting to use the legacy, non-Y2038-proof, APIs).
+
+Each of these test applications, when run, prints one line per test,
+strating with with either 'ok' or 'FAILED'. Tests are run in the same
+order for both test_y2038 and test_n2038.  
 
 # How to tune it
 

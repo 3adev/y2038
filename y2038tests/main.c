@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "id_kernel.h"
 #include "id_glibc.h"
+
+#include "tests.h"
+
 #include "test_clock_gettime_settime.h"
 #include "test_ctime.h"
 #include "test_difftime.h"
@@ -22,46 +25,36 @@
 
 int main(int argc, char*argv[])
 { 
-  int tests_run = 0;
-  int tests_fail = 0;
-
   int err = print_kernel_version();
   if (!err) err = print_glibc_version();
   
   if (err) return 1;
 
-  printf("------------------------------------------\n");
-  test_clock_gettime_settime(&tests_run, &tests_fail);
-  test_difftime(&tests_run, &tests_fail);
-  test_ctime(&tests_run, &tests_fail);
-  test_gmtime(&tests_run, &tests_fail);
-  test_gmtime_r(&tests_run, &tests_fail);
-  test_mktime(&tests_run, &tests_fail);
-  test_ctime_r(&tests_run, &tests_fail);
-  test_timegm(&tests_run, &tests_fail);
-  test_clock_nanosleep(&tests_run, &tests_fail);
-  test_timespec_get(&tests_run, &tests_fail);
-  test_futimens(&tests_run, &tests_fail);
-  test_utimensat(&tests_run, &tests_fail);
-  test_timer_gettime_settime(&tests_run, &tests_fail);
-  test_timerfd_gettime_settime(&tests_run, &tests_fail);
-  test_stat(&tests_run, &tests_fail);
-  test_fstat(&tests_run, &tests_fail);
-  test_lstat(&tests_run, &tests_fail);
-  test_fstatat(&tests_run, &tests_fail);
-  printf("------------------------------------------\n");
+  printf("\n");
 
-  if (tests_run == 0)
-  {
-    printf("*** NO TEST RUN\n");
-    return 1;
-  }
-  if (tests_fail > 0)
-  {
-    printf("*** %d OF %d TESTS FAILED\n", tests_fail, tests_run);
-    return 2;
-  }
-  printf("*** ALL OF THE %d TESTS SUCCEEDED\n", tests_run);
+  tests_init();
+
+  test_clock_gettime_settime();
+  test_difftime();
+  test_ctime();
+  test_gmtime();
+  test_gmtime_r();
+  test_mktime();
+  test_ctime_r();
+  test_timegm();
+  test_clock_nanosleep();
+  test_timespec_get();
+  test_futimens();
+  test_utimensat();
+  test_timer_gettime_settime();
+  test_timerfd_gettime_settime();
+  test_stat();
+  test_fstat();
+  test_lstat();
+  test_fstatat();
+
+  tests_report();
+
   return 0;
 }
 

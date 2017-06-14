@@ -5,29 +5,22 @@
 #include <errno.h>
 #include <string.h>
 
-#if defined _TIME_BITS && _TIME_BITS == 64
-#define FMTD "%lld"
-#else
-#define FMTD "%ld"
-#endif
+#include "tests.h"
 
 static int test_fstatat_call(
   const char  *pathname,
   struct stat *buf)
 {
   int result = fstatat(0, pathname, buf, 0);
-  if (result)
-  {
-    printf("fstatat(\"%s\") returned %d, errno = %d (%s)\n",
-      pathname, result, errno, strerror(errno));
-  }
   return result;
 }
 
-void test_fstatat(int *tests_run, int *tests_fail)
+void test_fstatat(void)
 {
   int result;
   struct stat buf;
+
+  test_begin("Call fstatat() on /etc/init.d/rcS");
   result = test_fstatat_call("/etc/init.d/rcS", &buf);
-  (*tests_run)++; (*tests_fail) += (result!=0);
+  if (result) test_failure(); else test_success();
 }

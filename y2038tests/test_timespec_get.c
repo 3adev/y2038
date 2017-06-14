@@ -4,16 +4,9 @@
 #include <errno.h>
 #include <string.h>
 
-#include "id_kernel.h"
-#include "id_glibc.h"
+#include "tests.h"
 
-#if defined _TIME_BITS && _TIME_BITS == 64
-#define FMTD "%lld"
-#else
-#define FMTD "%ld"
-#endif
-
-void test_timespec_get(int *tests_run, int *tests_fail)
+void test_timespec_get(void)
 {
   struct timespec then, now;
   time_t diff;
@@ -21,32 +14,18 @@ void test_timespec_get(int *tests_run, int *tests_fail)
   memset(&then, 0x55, sizeof(then));
   memset(&now, 0x55, sizeof(now));
 
+  test_begin("Get current real time before timespec_get()");
   int result = clock_gettime(CLOCK_REALTIME, &then);
-  (*tests_run)++;
-  if (result)
-  {
-    printf("clock_gettime() returned %d (errno %d '%s')\n",
-      result, errno, strerror(errno));
-    (*tests_fail)++;
-  }
+  if (result) test_failure(); else test_success();
 
+  test_begin("Call timespec_get(&now, TIME_UTC)");
   result = timespec_get(&now, TIME_UTC);
-  (*tests_run)++;
-  if (result != TIME_UTC)
-  {
-    printf("timespec_get() returned %d (errno %d '%s')\n",
-      result, errno, strerror(errno));
-    (*tests_fail)++;
-  }
+  if (result != TIME_UTC) test_failure(); else test_success();
 
+  test_begin("Check that timespec_get() returned real time");
   diff = now.tv_sec-then.tv_sec;
   diff *= 1000000000;
   diff += now.tv_nsec-then.tv_nsec;
   diff %= 1000000000;
-
-  if (diff > 1000000) /* more than 1 ms ( = 1000000 ns )*/
-  {
-    printf("timespec_get() was in error by " FMTD " ns\n", diff);
-    (*tests_fail)++;
-  }
+  if (diff > 100000000) test_failure(); else test_success();
 }

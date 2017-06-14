@@ -1,1 +1,1 @@
-extern void test_fstat(int *tests_run, int *tests_ok);
+extern void test_fstat(void);
