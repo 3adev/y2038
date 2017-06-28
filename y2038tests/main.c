@@ -22,6 +22,7 @@
 #include "test_fstat.h"
 #include "test_lstat.h"
 #include "test_fstatat.h"
+#include "test_time_stime.h"
 
 int main(int argc, char*argv[])
 { 
@@ -52,6 +53,7 @@ int main(int argc, char*argv[])
   test_fstat();
   test_lstat();
   test_fstatat();
+  test_time_stime();
 
   tests_report();
 
