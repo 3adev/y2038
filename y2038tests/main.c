@@ -23,6 +23,7 @@
 #include "test_lstat.h"
 #include "test_fstatat.h"
 #include "test_time_stime.h"
+#include "test_gettimeofday_settimeofday.h"
 
 int main(int argc, char*argv[])
 { 
@@ -54,6 +55,7 @@ int main(int argc, char*argv[])
   test_lstat();
   test_fstatat();
   test_time_stime();
+  test_gettimeofday_settimeofday();
 
   tests_report();
 
