@@ -122,10 +122,10 @@ $(KERNEL_BUILD_DIR_N2038)/.config: configs/kernel-$(ARCH)-defconfig-n2038 | $(KE
 # How to build the image for the image
 
 $(KERNEL_IMAGE_Y2038): $(KERNEL_BUILD_DIR_Y2038)/.config
-	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_Y2038) zImage
+	$(MAKE) -j -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_Y2038) zImage
 
 $(KERNEL_IMAGE_N2038): $(KERNEL_BUILD_DIR_N2038)/.config
-	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_N2038) zImage
+	$(MAKE) -j -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_N2038) zImage
 
 # How to build the device tree for the image
 
