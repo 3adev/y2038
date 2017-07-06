@@ -24,6 +24,8 @@
 #include "test_fstatat.h"
 #include "test_time_stime.h"
 #include "test_gettimeofday_settimeofday.h"
+#include "test_mq_timedreceive.h"
+#include "test_mq_timedsend.h"
 
 int main(int argc, char*argv[])
 { 
@@ -56,6 +58,8 @@ int main(int argc, char*argv[])
   test_fstatat();
   test_time_stime();
   test_gettimeofday_settimeofday();
+  test_mq_timedreceive();
+  test_mq_timedsend();
 
   tests_report();
 
