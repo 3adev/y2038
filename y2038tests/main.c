@@ -27,6 +27,7 @@
 #include "test_mq_timedreceive.h"
 #include "test_mq_timedsend.h"
 #include "test_msgctl.h"
+#include "test_sched_rr_get_interval.h"
 
 int main(int argc, char*argv[])
 { 
@@ -62,6 +63,7 @@ int main(int argc, char*argv[])
   test_mq_timedreceive();
   test_mq_timedsend();
   test_msgctl();
+  test_sched_rr_get_interval();
 
   tests_report();
 
