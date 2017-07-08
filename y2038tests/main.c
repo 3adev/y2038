@@ -26,6 +26,7 @@
 #include "test_gettimeofday_settimeofday.h"
 #include "test_mq_timedreceive.h"
 #include "test_mq_timedsend.h"
+#include "test_msgctl.h"
 
 int main(int argc, char*argv[])
 { 
@@ -60,6 +61,7 @@ int main(int argc, char*argv[])
   test_gettimeofday_settimeofday();
   test_mq_timedreceive();
   test_mq_timedsend();
+  test_msgctl();
 
   tests_report();
 
