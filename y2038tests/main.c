@@ -30,6 +30,7 @@
 #include "test_sched_rr_get_interval.h"
 #include "test_nanosleep.h"
 #include "test_adjtime.h"
+#include "test_utime.h"
 
 int main(int argc, char*argv[])
 { 
@@ -68,6 +69,7 @@ int main(int argc, char*argv[])
   test_sched_rr_get_interval();
   test_nanosleep();
   test_adjtime();
+  test_utime();
 
   tests_report();
 
