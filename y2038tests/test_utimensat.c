@@ -13,7 +13,7 @@ static int test_utimensat_call(int dirfd, const char *name, const struct
 {
   close(open(name, O_CREAT));
   int result = utimensat(dirfd, name, t, flags);
-  return (result!=0);
+  return result;
 }
 
 void test_utimensat(void)
@@ -23,9 +23,9 @@ void test_utimensat(void)
 
   test_begin("test_utimensat_call(0, \"/utimensat.ref\", NULL, 0)");
   int result = test_utimensat_call(0, "/utimensat.ref", NULL, 0);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "utimensat('/utimensat.ref', {0,120}) returned %d", result); else test_success();
 
   test_begin("test_utimensat_call(0, \"/utimensat.tst\", {{Y2038, 0},{Y2038+120s,0}}, 0)");
   result = test_utimensat_call(0, "/utimensat.tst", t, 0);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "utimensat('/utimensat.tst', {Y2038,Y2038+120}) returned %d", result); else test_success();
 }

@@ -24,19 +24,19 @@ void test_set_getitimer(void)
   test_begin("Setting real time interval timer to 2 seconds");
   struct itimerval settings = { { 2, 0 }, { 2, 0 } };
   int result = test_setitimer(&settings);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "setitimer returned %d", result); else test_success();
 
   test_begin("Getting real time interval timer");
   struct itimerval value1;
   result = test_getitimer(&value1);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "getitimer returned %d", result); else test_success();
 
   usleep(1000000);
 
   test_begin("Getting real time interval timer 1 second later");
   struct itimerval value2;
   result = test_getitimer(&value2);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "getitimer returned %d", result); else test_success();
 
   test_begin("Checking real time interval timer elapsed time");
   int64_t diff = value1.it_value.tv_sec - value2.it_value.tv_sec;
@@ -48,8 +48,7 @@ void test_set_getitimer(void)
   {
     int64_t s = diff / 1000000;
     int64_t n = diff % 1000000;
-    printf("real time interval timer lasted %lld.%09lld second instead of 1.0\n", s, n);
-    test_failure();
+    test_failure(0, "real time interval timer lasted %lld.%09lld second instead of 1.0", s, n);
   }
   else
     test_success();

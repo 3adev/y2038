@@ -11,8 +11,7 @@ static int test_stat_call(
   const char  *pathname,
   struct stat *buf)
 {
-  int result = stat(pathname, buf);
-  return result;
+  return stat(pathname, buf);
 }
 
 void test_stat(void)
@@ -22,5 +21,5 @@ void test_stat(void)
 
   test_begin("Call stat() on /etc/init.d/rcS");
   result = test_stat_call("/etc/init.d/rcS", &buf);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "stat('/etc/init.d/rcS') returned %d", result); else test_success();
 }

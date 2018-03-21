@@ -7,20 +7,30 @@
 
 #include "tests.h"
 
-static int test_gettimeofday(const struct timeval *tv)
+static void test_gettimeofday(const struct timeval *tv)
 {
   struct timeval t0;
   int result = gettimeofday(&t0, NULL);
+  if (result)
+  {
+    test_failure(1, "gettimeofday returned %d", result);
+    return;
+  }
   double d = difftime(t0.tv_sec, tv->tv_sec);
-  if (d < -1.0 || d > 1.0) return 1;
-  return 0;
+  if (d < -1.0 || d > 1.0)
+    test_failure(0, "gettimeofday error is %g second, more than one second", d);
+  else
+    test_success();
 }
 
 static int test_settimeofday(const struct timeval *tv)
 {
   int result = settimeofday(tv, NULL);
-  if (result) return 1;
-  return 0;
+  if (result)
+    test_failure(1, "settimeofday returned %d", result);
+  else
+    test_success();
+  return result;
 }
 
 void test_gettimeofday_settimeofday(void)
@@ -29,20 +39,18 @@ void test_gettimeofday_settimeofday(void)
 
   test_begin("Save current time of day");
   int result = gettimeofday(&t0, NULL);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "gettimeofday returned %d", result); else test_success();
 
   test_begin("Set time of day to Y2038 minus 60 seconds");
   t.tv_sec = 0x7FFFFFFF;
   t.tv_sec -= 59;
   t.tv_usec = 0;
-  result = test_settimeofday(&t);
-  if (result) test_failure(); else test_success();
+  test_settimeofday(&t);
   
   if (result == 0)
   {
     test_begin("Check time of day against Y2038-60s");
-    result = test_gettimeofday(&t);
-    if (result) test_failure(); else test_success();
+    test_gettimeofday(&t);
   }
 
   test_begin("Set time of day to Y2038 plus 60 seconds");
@@ -50,16 +58,14 @@ void test_gettimeofday_settimeofday(void)
   t.tv_sec += 61;
   t.tv_usec = 0;
   result = test_settimeofday(&t);
-  if (result) test_failure(); else test_success();
 
   if (result == 0)
   {
     test_begin("Check time of day against Y2038+60s");
-    result = test_gettimeofday(&t);
-    if (result) test_failure(); else test_success();
+    test_gettimeofday(&t);
   }
 
   test_begin("Restore time of day");
   result = settimeofday(&t0, NULL);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "settimeofday returned %d", result); else test_success();
 }

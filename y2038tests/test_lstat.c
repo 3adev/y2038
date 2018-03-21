@@ -22,5 +22,5 @@ void test_lstat(void)
 
   test_begin("Call lstat() on /etc/init.d/rcS");
   result = test_lstat_call("/etc/init.d/rcS", &buf);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "lstat('/etc/init.d/rcS') returned %d", result); else test_success();
 }

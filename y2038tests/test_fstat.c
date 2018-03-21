@@ -12,8 +12,7 @@ static int test_fstat_call(
   int fd,
   struct stat *buf)
 {
-  int result = fstat(fd, buf);
-  return result;
+  return fstat(fd, buf);
 }
 
 void test_fstat(void)
@@ -24,7 +23,7 @@ void test_fstat(void)
 
   test_begin("Call fstat() on /etc/init.d/rcS");
   result = test_fstat_call(fd, &buf);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "fstat('/etc/init.d/rcS') returned %d", result); else test_success();
 
   close(fd);
 }

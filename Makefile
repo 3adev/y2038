@@ -312,6 +312,17 @@ qemu-y2038: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
 	@echo "*******************************************"
 	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE_Y2038) -dtb $(KERNEL_DTB_Y2038) -initrd initramfs-y2038 -append $(KERNEL_COMMAND_LINE)
 
+# run the image under QEMU
+qemu-y2038-d: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
+	@echo "*******************************************"
+	@echo "***                                     ***"
+	@echo "***   NOW RUNNING Y2038 IMAGE IN QEMU   ***"
+	@echo "***             (DEBUG)                 ***"
+	@echo "***   To exit, hit Ctrl-A, then X       ***"
+	@echo "***                                     ***"
+	@echo "*******************************************"
+	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE_Y2038) -dtb $(KERNEL_DTB_Y2038) -initrd initramfs-y2038 -append $(KERNEL_COMMAND_LINE) -s
+
 qemu-n2038: $(KERNEL_IMAGE_N2038) $(KERNEL_DTB_N2038) initramfs-n2038
 	@echo "*******************************************"
 	@echo "***                                     ***"

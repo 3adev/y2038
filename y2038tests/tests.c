@@ -1,6 +1,9 @@
 #include "tests.h"
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
 
 static int test_failures;
 static int test_successes;
@@ -14,21 +17,32 @@ void tests_init(void)
   printf("----------------------------------------------------\n");
 }
 
+static int test_underway;
+
 void test_begin(const char *description)
 {
   test_desc = description;
+  test_underway = 1;
 }
 
-void test_failure(void)
+void test_failure(int print_errno, const char *fmt, ...)
 {
-  printf("FAILED -- %s\n", test_desc);
-  test_failures++;
+  va_list ap;
+  printf("FAILED -- %s ", test_desc);
+  va_start(ap, fmt);
+  vprintf(fmt, ap);
+  va_end(ap);
+  if (print_errno) printf(" (errno= %d / %s)", errno, strerror(errno));
+  printf("\n");
+  if (test_underway) test_failures++;
+  test_underway = 0;
 }
 
 void test_success(void)
 {
   printf("ok     -- %s\n", test_desc);
-  test_successes++;
+  if (test_underway) test_successes++;
+  test_underway = 0;
 }
 
 void tests_report(void)

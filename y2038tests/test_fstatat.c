@@ -11,8 +11,7 @@ static int test_fstatat_call(
   const char  *pathname,
   struct stat *buf)
 {
-  int result = fstatat(0, pathname, buf, 0);
-  return result;
+  return fstatat(0, pathname, buf, 0);
 }
 
 void test_fstatat(void)
@@ -22,5 +21,5 @@ void test_fstatat(void)
 
   test_begin("Call fstatat() on /etc/init.d/rcS");
   result = test_fstatat_call("/etc/init.d/rcS", &buf);
-  if (result) test_failure(); else test_success();
+  if (result) test_failure(1, "fstatat('/etc/init.d/rcS') returned %d", result); else test_success();
 }
