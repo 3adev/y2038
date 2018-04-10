@@ -90,4 +90,5 @@ void test_utime(void)
         (long long int) t2.actime,
         (long long int) t2.modtime);
   }
+  else test_success();
 }

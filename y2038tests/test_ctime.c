@@ -20,7 +20,6 @@ static void test_ctime_call(
 
 void test_ctime(void)
 {
-  int result;
   time_t t;
  
   test_begin("Check that ctime(\"Thu Jan  1 00:00:00 1970\") == 0");

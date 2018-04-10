@@ -8,7 +8,7 @@
 int print_glibc_version(void)
 {
   char *confbuf;
-  int conflen;
+  unsigned int conflen;
 
   conflen = confstr(  _CS_GNU_LIBC_VERSION, NULL, 0);
   if (!conflen)

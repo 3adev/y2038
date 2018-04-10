@@ -43,7 +43,7 @@ export LD=$(CROSS_COMPILE)ld
 KERNEL_GIT = git://git.kernel.org/pub/scm/linux/kernel/git/arnd/playground.git
 KERNEL_COMMIT = y2038-4.8
 KERNEL_DEVICE_TREE  = vexpress-v2p-ca15-tc1
-KERNEL_COMMAND_LINE = 'quiet console=ttyAMA0'
+KERNEL_COMMAND_LINE = 'root=/dev/ram  rw quiet console=ttyAMA0'
 
 # GLIBC
 
@@ -58,7 +58,8 @@ BUSYBOX_COMMIT = 1_26_1
 
 # QEMU
 
-QEMU_MACHINE = vexpress-a15
+export QEMU_ARCH=arm
+QEMU_ARGS = -M vexpress-a15 -m 2048
 
 #---------------------------------------------------------------------------
 # GLOBAL TARGETS
@@ -68,7 +69,7 @@ QEMU_MACHINE = vexpress-a15
 .PHONY: all clean clean-all qemu
 
 # default target creates initramfs but does not run it.
-all: initramfs-y2038
+all: initrd-y2038.gz
 
 # clean only cleans the rootfs and initramfs 
 clean:
@@ -76,10 +77,12 @@ clean:
 	git clean -xfd rootfs-y2038
 	rm -f initramfs-n2038
 	rm -f initramfs-y2038
+	rm -f initrd-y2038.gz
+	rm -f initrd-n2038.gz
 
 # clean-all cleans and asks for subprojects to clean
-# NOTE GLIBC's clean target is *very slow*. It's just faster
-# to simply delete the GLIBC build dir.
+# NOTE: The GLIBC clean target is *very slow*.
+#       It's just faster to simply delete the build dir.
 clean-all: clean
 	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_Y2038) clean
 	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_N2038) clean
@@ -129,11 +132,15 @@ $(KERNEL_IMAGE_N2038): $(KERNEL_BUILD_DIR_N2038)/.config
 
 # How to build the device tree for the image
 
+ifneq ($(KERNEL_DTB_Y2038),)
 $(KERNEL_DTB_Y2038): $(KERNEL_BUILD_DIR_Y2038)/.config
 	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_Y2038) dtbs
+endif
 
+ifneq ($(KERNEL_DTB_N2038),)
 $(KERNEL_DTB_N2038): $(KERNEL_BUILD_DIR_N2038)/.config
 	$(MAKE) -C $(KERNEL_SOURCE_DIR) O=$(KERNEL_BUILD_DIR_N2038) dtbs
+endif
 
 # pseudo targets to build all only the kernel, only the dtbs, all of
 # linux
@@ -296,13 +303,27 @@ initramfs-y2038: rootfs-y2038
 initramfs-n2038: rootfs-n2038
 	(cd $(ROOTFS_DIR_N2038) && find | cpio -o --format=newc) > initramfs-n2038
 
+initrd-y2038.gz: initramfs-y2038
+	gzip < initramfs-y2038 > initrd-y2038.gz
+
+initrd-n2038.gz: initramfs-n2038
+	gzip < initramfs-n2038 > initrd-n2038.gz
+
 #---------------------------------------------------------------------------
 # QEMU
 # Declared last here as it depends on previous targets defined above
 #---------------------------------------------------------------------------
 
+ifneq ($(KERNEL_DTB_Y2038),)
+QEMU_DTB_Y2038 = -dtb $(KERNEL_DTB_Y2038)
+endif
+
+ifneq ($(KERNEL_DTB_N2038),)
+QEMU_DTB_N2038 = -dtb $(KERNEL_DTB_N2038)
+endif
+
 # run the image under QEMU
-qemu-y2038: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
+qemu-y2038: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initrd-y2038.gz
 	@echo "*******************************************"
 	@echo "***                                     ***"
 	@echo "***   NOW RUNNING Y2038 IMAGE IN QEMU   ***"
@@ -310,10 +331,10 @@ qemu-y2038: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
 	@echo "***   To exit, hit Ctrl-A, then X       ***"
 	@echo "***                                     ***"
 	@echo "*******************************************"
-	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE_Y2038) -dtb $(KERNEL_DTB_Y2038) -initrd initramfs-y2038 -append $(KERNEL_COMMAND_LINE)
+	qemu-system-$(QEMU_ARCH) -nographic $(QEMU_ARGS) -kernel $(KERNEL_IMAGE_Y2038) $(QEMU_DTB_Y2038) -initrd initrd-y2038.gz -append $(KERNEL_COMMAND_LINE)
 
 # run the image under QEMU
-qemu-y2038-d: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
+qemu-y2038-d: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initrd-y2038.gz
 	@echo "*******************************************"
 	@echo "***                                     ***"
 	@echo "***   NOW RUNNING Y2038 IMAGE IN QEMU   ***"
@@ -321,9 +342,9 @@ qemu-y2038-d: $(KERNEL_IMAGE_Y2038) $(KERNEL_DTB_Y2038) initramfs-y2038
 	@echo "***   To exit, hit Ctrl-A, then X       ***"
 	@echo "***                                     ***"
 	@echo "*******************************************"
-	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE_Y2038) -dtb $(KERNEL_DTB_Y2038) -initrd initramfs-y2038 -append $(KERNEL_COMMAND_LINE) -s
+	qemu-system-$(QEMU_ARCH) -nographic $(QEMU_ARGS) -kernel $(KERNEL_IMAGE_Y2038) $(QEMU_DTB_Y2038) -initrd initrd-y2038.gz -append $(KERNEL_COMMAND_LINE) -s
 
-qemu-n2038: $(KERNEL_IMAGE_N2038) $(KERNEL_DTB_N2038) initramfs-n2038
+qemu-n2038: $(KERNEL_IMAGE_N2038) $(KERNEL_DTB_N2038) initrd-n2038.gz
 	@echo "*******************************************"
 	@echo "***                                     ***"
 	@echo "***   NOW RUNNING N2038 IMAGE IN QEMU   ***"
@@ -331,4 +352,4 @@ qemu-n2038: $(KERNEL_IMAGE_N2038) $(KERNEL_DTB_N2038) initramfs-n2038
 	@echo "***   To exit, hit Ctrl-A, then X       ***"
 	@echo "***                                     ***"
 	@echo "*******************************************"
-	qemu-system-$(ARCH) -nographic -machine $(QEMU_MACHINE) -m 2048 -kernel $(KERNEL_IMAGE_N2038) -dtb $(KERNEL_DTB_N2038) -initrd initramfs-n2038 -append $(KERNEL_COMMAND_LINE)
+	qemu-system-$(QEMU_ARCH) -nographic $(QEMU_ARGS) -kernel $(KERNEL_IMAGE_N2038) $(QEMU_DTB_N2038) -initrd initrd-n2038.gz -append $(KERNEL_COMMAND_LINE)

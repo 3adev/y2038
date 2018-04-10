@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <time.h>
+#include <stdarg.h>
 #include "id_kernel.h"
 #include "id_glibc.h"
 
@@ -33,8 +35,20 @@
 #include "test_utime.h"
 #include "test_set_getitimer.h"
 
-int main(int argc, char*argv[])
+# if defined(_TIME_BITS) && _TIME_BITS==64
+ #define _TIME_T_SIZE 8
+#else
+ #define _TIME_T_SIZE 4
+#endif
+
+int main(int argc __attribute__((unused)), char*argv[] __attribute__((unused)))
 { 
+  int time_t_size = sizeof(time_t);
+  if (time_t_size != _TIME_T_SIZE)
+  {
+      printf("sizeof(time_t) = %d (expected %d)\n", time_t_size, _TIME_T_SIZE) ;
+      return 1;
+  }
   int err = print_kernel_version();
   if (!err) err = print_glibc_version();
   
@@ -44,34 +58,34 @@ int main(int argc, char*argv[])
 
   tests_init();
 
-  test_clock_gettime_settime();
-  test_difftime();
-  test_ctime();
-  test_gmtime();
-  test_gmtime_r();
-  test_mktime();
-  test_ctime_r();
-  test_timegm();
-  test_clock_nanosleep();
-  test_timespec_get();
-  test_futimens();
-  test_utimensat();
-  test_timer_gettime_settime();
-  test_timerfd_gettime_settime();
-  test_stat();
-  test_fstat();
-  test_lstat();
-  test_fstatat();
-  test_time_stime();
-  test_gettimeofday_settimeofday();
-  test_mq_timedreceive();
-  test_mq_timedsend();
-  test_msgctl();
-  test_sched_rr_get_interval();
-  test_nanosleep();
-  test_adjtime();
-  test_utime();
-  test_set_getitimer();
+  test_run(test_clock_gettime_settime);
+  test_run(test_difftime);
+  test_run(test_ctime);
+  test_run(test_gmtime);
+  test_run(test_gmtime_r);
+  test_run(test_mktime);
+  test_run(test_ctime_r);
+  test_run(test_timegm);
+  test_run(test_clock_nanosleep);
+  test_run(test_timespec_get);
+  test_run(test_futimens);
+  test_run(test_utimensat);
+  test_run(test_timer_gettime_settime);
+  test_run(test_timerfd_gettime_settime);
+  test_run(test_stat);
+  test_run(test_fstat);
+  test_run(test_lstat);
+  test_run(test_fstatat);
+  test_run(test_time_stime);
+  test_run(test_gettimeofday_settimeofday);
+  test_run(test_mq_timedreceive);
+  test_run(test_mq_timedsend);
+  test_run(test_msgctl);
+  test_run(test_sched_rr_get_interval);
+  test_run(test_nanosleep);
+  test_run(test_adjtime);
+  test_run(test_utime);
+  test_run(test_set_getitimer);
 
   tests_report();
 

@@ -5,7 +5,7 @@
 
 #include "tests.h"
 
-static int test_difftime_call(
+static void test_difftime_call(
   time_t time1,
   time_t time0,
   double expected_result)

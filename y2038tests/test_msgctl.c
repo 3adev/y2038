@@ -9,11 +9,14 @@
 
 static void test_msgctl_onqueue(int q)
 {
-  struct
+  typedef struct
   {
     long mtype;
     char mtext[1];
-  } msgs = { 42, 'X' }, msgr = { -1, 'Z' };
+  } msg_t;
+
+  msg_t msgs = { .mtype = 42, .mtext = { 'X' } };
+  msg_t msgr = { .mtype = -1, .mtext = { 'Z' } };
 
   test_begin("call msgctl() with a never-used queue");
   struct msqid_ds stat;
@@ -53,7 +56,7 @@ static void test_msgctl_onqueue(int q)
     result = msgrcv(q, &msgr, sizeof(msgs.mtext), 0, IPC_NOWAIT);
     if (result < 0)
       test_failure(1, "msgrcv returned %d", result);
-    else if (result < sizeof(msgs.mtext))
+    else if (result != sizeof(msgs.mtext))
       test_failure(0, "msgrcv returned %d, expected %d", result, sizeof(msgs.mtext));
     else
     {

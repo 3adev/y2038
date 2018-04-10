@@ -32,10 +32,8 @@ static void test_timerfd_settime(int fd, const struct itimerspec
 void test_timerfd_gettime_settime(void)
 {
   int fd;
-  struct sigevent sevp;
 
   test_begin("Call timerfd_create()");
-  sevp.sigev_notify = SIGEV_NONE;
   int result = timerfd_create(CLOCK_REALTIME, 0);
   if (result==-1) test_failure(1, "timerfd_create(CLOCK_REALTIME, 0) returned -1"); else 
   {

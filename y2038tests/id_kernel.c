@@ -56,4 +56,5 @@ int check_kernel_timekeeping(void)
     printf("** Kernel timekeeping not Y2038-proof!      **\n");
     printf("**********************************************\n");
   }
+  return result;
 }

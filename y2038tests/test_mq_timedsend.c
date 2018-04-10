@@ -47,6 +47,11 @@ void test_mq_timedsend_onqueue(mqd_t q)
       test_success();
   }
 
+// Only test this part if we can set the time beyond Y2038
+// i.e. if our time_t is 64-bit
+
+#if defined(__USE_TIME_BITS_64) && __USE_TIME_BITS_64 == 1
+
   test_begin("Get current time");
   time_t t0 = time(NULL);
   if (t0==(time_t)-1)
@@ -103,13 +108,15 @@ void test_mq_timedsend_onqueue(mqd_t q)
     test_failure(1, "stime returned %d", result);
   else 
     test_success();
+
+#endif
 }
 
 void test_mq_timedsend(void)
 {
   test_begin("Create the message queue");
   struct mq_attr mq_attr = { .mq_maxmsg = 1, .mq_msgsize = 8 };
-  mqd_t q = mq_open("/y2038", O_RDWR | O_CREAT, 0x777, &mq_attr);
+  mqd_t q = mq_open("/y2038s", O_RDWR | O_CREAT, 0x777, &mq_attr);
   if (q == (mqd_t) -1)
   {
     test_failure(1, "mq_open returned -1");
@@ -123,6 +130,13 @@ void test_mq_timedsend(void)
   int cq = mq_close(q);
   if (cq)
     test_failure(1, "mq_close returned %d", cq);
+  else
+    test_success();
+
+  test_begin("Remove the message queue");
+  int uq = mq_unlink("/y2038s");
+  if (uq)
+    test_failure(1, "mq_unlink returned %d", uq);
   else
     test_success();
 }

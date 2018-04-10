@@ -5,7 +5,7 @@
 
 #include "tests.h"
 
-static int test_ctime_r_call(
+static void test_ctime_r_call(
   const time_t *timep,
   const char *expected_result)
 {
@@ -21,7 +21,6 @@ static int test_ctime_r_call(
 
 void test_ctime_r(void)
 {
-  int result;
   time_t t;
 
   test_begin("Check that ctime_r(\"Thu Jan  1 00:00:00 1970\") == 0");

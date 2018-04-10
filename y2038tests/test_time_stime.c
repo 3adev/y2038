@@ -41,24 +41,14 @@ void test_time_stime(void)
   t = 0x7FFFFFFF;
   t -= 59;
   int result = test_stime(t);
-  
-  if (result == 0)
-  {
-    test_begin("Check time against Y2038-60s");
-    test_time(t);
-  }
+  if (result == 0) test_time(t);
 
   test_begin("Set time to Y2038 plus 60 seconds");
   t = 0x7FFFFFFF;
   t += 61;
   result = test_stime(t);
-
-  if (result == 0)
-  {
-    test_begin("Check time against Y2038+60s");
-    test_time(t);
-  }
-
+  if (result == 0) test_time(t);
+  
   test_begin("Restore time");
   result = stime(&t0);
   if (result) test_failure(1, "stime returned %d", result); else test_success();
