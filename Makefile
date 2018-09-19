@@ -36,6 +36,7 @@ export ARCH=arm
 export CROSS_COMPILE=$(TARGET_ARCH)-
 
 export CC=$(CROSS_COMPILE)gcc
+export CXX=arm-linux-gnueabi-g++
 export LD=$(CROSS_COMPILE)ld
 
 # KERNEL
@@ -183,7 +184,7 @@ $(GLIBC_SOURCE_DIR)/configure:
 # How to configure the component
 $(GLIBC_BUILD_DIR)/Makefile: $(GLIBC_SOURCE_DIR)/configure  $(KERNEL_HDR_Y2038)
 	mkdir -p $(GLIBC_BUILD_DIR)
-	cd $(GLIBC_BUILD_DIR) && $(GLIBC_SOURCE_DIR)/configure --prefix=/usr --host=$(GLIBC_HOST) --with-headers=$(KERNEL_HDR_DIR_Y2038)/include libc_cv_forced_unwind=yes libc_cv_c_cleanup=yes
+	cd $(GLIBC_BUILD_DIR) && $(GLIBC_SOURCE_DIR)/configure --prefix=/usr --host=$(GLIBC_HOST) --with-headers=$(KERNEL_HDR_DIR_Y2038)/include
 
 # How to build the component
 $(GLIBC_LIBS): $(GLIBC_BUILD_DIR)/Makefile
